@@ -84,8 +84,6 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
       tagz = event.get("tags")
     end
     dd_metrics['tags'] = tagz if tagz
-
-    @logger.info("Queueing event", :event => dd_metrics)
     buffer_receive(dd_metrics)
   end # def receive
 
@@ -100,7 +98,6 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
       request.body = series_to_json(dd_series)
       request.add_field("Content-Type", 'application/json')
       response = @client.request(request)
-      @logger.info("DD convo", :request => request.inspect, :response => response.inspect)
       raise unless response.code == '202'
     rescue Exception => e
       @logger.warn("Unhandled exception", :request => request.inspect, :response => response.inspect, :exception => e.inspect)
